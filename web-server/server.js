@@ -16,9 +16,9 @@ app.use((req, res, next) => {
     });
     next();
 });
-app.use((req, res, next) => {
-    res.render('maintenance.hbs');
-})
+// app.use((req, res, next) => {
+//     res.render('maintenance.hbs');
+// })
 app.use(express.static(__dirname + '/public'));
 
 hbs.registerHelper('getCurrentYear', () => {
@@ -42,6 +42,13 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/portfolio', (req, res) => {
+    res.render('portfolio.hbs', {
+        pageTitle: 'Portoflio Page',
+        titleName: 'Luiz Roberto Silva',
+        someTextAbout: 'Hello, I am trying to learn Node'
+    });
+})
 app.get('/about', (req, res) => {
     res.render('about.hbs', {
         pageTitle: 'About Page'
