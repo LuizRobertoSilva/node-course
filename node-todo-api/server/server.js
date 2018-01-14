@@ -9,7 +9,7 @@ var Todo = require('./models/todo.js').Todo;
 var User = require('./models/user.js').User;
 //var { User }= require('./models/user.js')
 //HEROKU SERVER -> process.env.PORT
- const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 
 
@@ -56,6 +56,24 @@ app.get('/todos/:id', (req, res) => {
         res.status(400).send();
     })
 });
+
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+        console.log('Id is not Valid');
+        res.status(404).send();
+    }
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.status(200).send({todoDeleted: todo})
+
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
 
 
 app.listen(port, () => {
