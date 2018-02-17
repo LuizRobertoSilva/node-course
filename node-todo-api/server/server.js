@@ -1,3 +1,4 @@
+require('./config/config');
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -7,15 +8,14 @@ var {
 } = require('mongodb');
 var Todo = require('./models/todo.js').Todo;
 var User = require('./models/user.js').User;
+var authenticate = require('./middleware/authenticate').authenticate;
 //var { User }= require('./models/user.js')
 //HEROKU SERVER -> process.env.PORT
-const port = process.env.PORT || 3000;
-
+const port = process.env.PORT;
 
 
 var app = express();
 app.use(bodyParser.json());
-
 
 app.post('/todos', (req, res) => {
     console.log(req.body);
@@ -97,7 +97,9 @@ app.patch('/todos/:id', (req, res) => {
         if (!todo) {
             return res.status(404).send();
         }
-        res.send({todo});
+        res.send({
+            todo
+        });
     }).catch((err) => {
         res.status().send();
     });
@@ -106,6 +108,23 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
+app.post('/users', (request, respond) => {
+    var body = _.pick(request.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        respond.header('x-auth', token).status(200).send(user);
+    }).catch((e) => {
+        console.log(e);
+        respond.status(400).send(e);
+    });
+});
+
+app.get('/user/me', authenticate, (req, res) => {
+    res.send(req.user);
+})
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
