@@ -3,3 +3,5 @@ node_modules/
 *.log
 
 notes-data.json
+
+server/config/config.json
